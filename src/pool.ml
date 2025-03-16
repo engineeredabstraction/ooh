@@ -30,6 +30,10 @@ module Encoded_pointer : sig
   val set_ptr_field : t -> int -> Optional.t -> unit
 
   module Optional_syntax = Optional.Optional_syntax
+
+  module Unsafe : sig
+    val of_int : int -> t
+  end
 end = struct
   type t = int
 
@@ -66,6 +70,10 @@ end = struct
   let set_ptr_field = set_int_field
 
   module Optional_syntax = Optional.Optional_syntax
+
+  module Unsafe = struct
+    let of_int i = i
+  end
 end
 
 module Pool_section : sig
@@ -113,6 +121,8 @@ type t =
   ; block_wosize : int
   ; block_count : int
   }
+
+let block_wosize t = t.block_wosize
 
 let init_section section block_count =
   for i = 1 to block_count - 1 do

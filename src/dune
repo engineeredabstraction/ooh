@@ -2,6 +2,6 @@
   (name ooh)
   (public_name ooh)
   (libraries typerep)
-  (preprocess (pps ppx_optional))
+  (preprocess (pps ppx_optional ppx_typerep_conv ppx_pipebang))
   (foreign_stubs (language c) (names pool_impl))
   )

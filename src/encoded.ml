@@ -18,3 +18,7 @@ end
 module Raw = struct
   let to_int (x : _ t) : int = x
 end
+
+module Private = struct
+  let unsafe_create (x : _ t) : _ t = x
+end

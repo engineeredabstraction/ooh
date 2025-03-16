@@ -15,3 +15,7 @@ end
 module Raw : sig
   val to_int : _ t -> int
 end
+
+module Private : sig
+  val unsafe_create : _ t -> _ t
+end

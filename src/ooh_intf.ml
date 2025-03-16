@@ -19,7 +19,7 @@ end
 module type Ext = sig
   module Container : Container
 
-  type ('container, 'value) t [@@immediate]
+  type ('container, 'value) t [@@immediate] [@@deriving typerep]
 
   val get : ('container, _) Container.t -> ('container, 'value) t -> 'value
 
@@ -30,6 +30,8 @@ module type Ext = sig
 
   module Unsafe : sig
     val get : ('container, 'value) t -> 'value
+    val as_int : ('container, 'value) t -> int
+    val of_int : int -> ('container, 'value) t
   end
 
   module Permanent : sig
@@ -65,9 +67,9 @@ module type S = sig
     module type Encoder = sig
       type value
 
-      val encode_exn : value -> 'v t
-      val unchecked_encode : value -> 'v t
-      val decode : 'v t -> value
+      val encode_exn : value -> value t
+      val unchecked_encode : value -> value t
+      val decode : value t -> value
     end
 
     module Int61 : Encoder with type value = int
@@ -104,19 +106,18 @@ module type S = sig
       :  'v Encoded.t
       -> ('vs, 'v) Witness.t
       -> 'vs t
-  end
 
-  and Option0 : sig
-    type 'value t = < v00 : 'value; v01 : unit > Multi_valued.t
+    module Option0 : sig
+      type 'value t = < v00 : 'value; v01 : unit > Multi_valued.t
 
-    module Optional_syntax : sig
       module Optional_syntax : sig
-        val is_none : _ t -> bool
-        val unsafe_value : 'value t -> 'value
+        module Optional_syntax : sig
+          val is_none : _ t -> bool
+          val unsafe_value : 'value t -> 'value
+        end
       end
     end
   end
-
 
   and Pool : sig
     module Raw : sig
@@ -146,8 +147,8 @@ module type S = sig
         -> template:'value
         -> ('container, 'value) t
 
+      val alloc_unitialized : ('container, 'value) t -> ('container, 'value) Ext.t
       val alloc : ('container, 'value) t -> ('container, 'value) Ext.t
-
       val alloc_with_tag : ('container, 'value) t -> int -> ('container, 'value) Ext.t
     end
 

@@ -1,11 +1,14 @@
 (* SPDX-FileCopyrightText: Copyright (C) 2025 Stefan Muenzel
  * SPDX-License-Identifier: MPL-2.0
  *)
+open Typerep_lib.Std
 
-type ('container, 'value) t = int
+type ('container, 'value) t = int [@@deriving typerep]
 
 module Unsafe = struct
   external get : ('container, 'value) t -> 'value = "%int_as_pointer"  
+  let as_int t = t
+  let of_int i = i
 end
 
 let get
