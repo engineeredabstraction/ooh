@@ -2,9 +2,7 @@
  * SPDX-License-Identifier: MPL-2.0
  *)
 
-module Nothing = struct
-  type t = |
-end
+module Nothing = Nothing
 
 module Witness = Witness
 
