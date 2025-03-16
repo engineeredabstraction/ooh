@@ -6,18 +6,30 @@ module Encoded_pointer : sig
   type t [@@immediate]
 
   val offset_words : t -> int -> t
-
   val deref : t -> Obj.t
-
   val as_int : t -> int
 
-  val is_null : t -> bool
+  module Optional : sig
+    type t' := t
+    type t [@@immediate]
+
+    val none : t
+    val some : t' -> t
+    module Optional_syntax : sig
+      module Optional_syntax : sig
+        val is_none : t -> bool
+        val unsafe_value : t -> t'
+      end
+    end
+  end
 
   val get_int_field : t -> int -> int
   val set_int_field : t -> int -> int -> unit
 
-  val get_ptr_field : t -> int -> t
-  val set_ptr_field : t -> int -> t -> unit
+  val get_ptr_field : t -> int -> Optional.t
+  val set_ptr_field : t -> int -> Optional.t -> unit
+
+  module Optional_syntax = Optional.Optional_syntax
 end = struct
   type t = int
 
@@ -28,7 +40,19 @@ end = struct
 
   let as_int t = t
 
-  let is_null t = t = 0
+  module Optional = struct
+    type t = int
+
+    let none = 0
+    let some t = t
+
+    module Optional_syntax = struct
+      module Optional_syntax = struct
+        let is_none t = t = 0
+        let unsafe_value t = t
+      end
+    end
+  end
 
   let get_int_field t i =
     let ar : int array = Obj.obj (deref t) in
@@ -40,6 +64,8 @@ end = struct
 
   let get_ptr_field = get_int_field
   let set_ptr_field = set_int_field
+
+  module Optional_syntax = Optional.Optional_syntax
 end
 
 module Pool_section : sig
@@ -82,7 +108,8 @@ end
 
 type t =
   { mutable section_list : Pool_section.t list
-  ; mutable free_list : Encoded_pointer.t
+  ; mutable free_list : Encoded_pointer.Optional.t
+  ; mutable total_blocks : int
   ; block_wosize : int
   ; block_count : int
   }
@@ -103,25 +130,29 @@ let create
   let block_count = initial_size in
   let section = Pool_section.create ~block_wosize ~block_count in
   let section_list = [ section ] in
-  let free_list = Pool_section.entry section 0 in
+  let free_list = Encoded_pointer.Optional.some (Pool_section.entry section 0) in
   init_section section block_count;
-  { section_list; free_list; block_wosize; block_count }
+  { section_list; free_list; block_wosize; block_count; total_blocks = block_count }
 
 let alloc t =
-  let entry = t.free_list in
+  let entry =
+    match%optional.Encoded_pointer t.free_list with
+    | None ->
+      let new_section =
+        Pool_section.create ~block_wosize:t.block_wosize ~block_count:t.block_count
+      in
+      init_section new_section t.block_count;
+      t.section_list <- new_section :: t.section_list;
+      let ptr = Pool_section.entry new_section 0 in
+      t.free_list <- Encoded_pointer.Optional.some ptr;
+      t.total_blocks <- t.total_blocks + t.block_count;
+      ptr
+    | Some ptr -> ptr
+  in
   let new_free_list = Encoded_pointer.get_ptr_field entry 0 in
   t.free_list <- new_free_list;
-  if Encoded_pointer.is_null new_free_list
-  then begin
-    let new_section =
-      Pool_section.create ~block_wosize:t.block_wosize ~block_count:t.block_count
-    in
-    init_section new_section t.block_count;
-    t.section_list <- new_section :: t.section_list;
-    t.free_list <- Pool_section.entry new_section 0
-  end;
   entry
 
 let free t entry =
   Encoded_pointer.set_ptr_field entry 0 t.free_list;
-  t.free_list <- entry
+  t.free_list <- Encoded_pointer.Optional.some entry
