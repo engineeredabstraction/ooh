@@ -40,9 +40,7 @@ end = struct
 end
 
 type 'vs t =
-  | T 
-    : ('vs, 'v) Raw.t
-      -> 'vs t
+  | T : ('vs, 'v) Raw.t -> 'vs t
 [@@unboxed] [@@immediate]
 
 let create

@@ -1,0 +1,4 @@
+ooh - an ocaml out-of-heap library
+---
+
+ooh provides a library for OCaml programs to use out-of-heap memory allocated from a pool.
