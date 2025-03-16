@@ -11,7 +11,7 @@ let as_int
     (witness : (vs, v) t)
   : int =
   match witness with
-  | V00 -> 0
-  | V01 -> 1
-  | V10 -> 2
-  | V11 -> 3
+  | V00 -> 0b00
+  | V01 -> 0b01
+  | V10 -> 0b10
+  | V11 -> 0b11
