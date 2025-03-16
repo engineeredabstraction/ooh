@@ -74,14 +74,24 @@ module Pool = struct
 
   type 'container t = ('container, Raw.t) Container.t
 
-  let create ~element_wosize ?initial_size () =
+  let element_wosize element_size =
+    match element_size with
+    | `Words w -> w
+    | `Typerep (Typerep_lib.Std.Typerep.T tr) ->
+      match Type_properties.ext_size tr with
+      | None -> failwith "No size for type"
+      | Some size -> size
+
+  let create ~element_size ?initial_size () =
+    let element_wosize = element_wosize element_size in
     Pool.create ~element_wosize ?initial_size ()
     |> Container.Private.create
     |> Container.Packed.T
 
   let permanent = ref []
 
-  let create_permanent ~element_wosize ?initial_size () =
+  let create_permanent ~element_size ?initial_size () =
+    let element_wosize = element_wosize element_size in
     let v = Pool.create ~element_wosize ?initial_size () in
     permanent := v :: !permanent;
     Container.Private.create v

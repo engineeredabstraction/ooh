@@ -2,6 +2,8 @@
  * SPDX-License-Identifier: MPL-2.0
  */
 
+#include <stdio.h>
+
 #include <caml/mlvalues.h>
 #include <caml/memory.h>
 
@@ -20,12 +22,12 @@ CAMLprim value ooh_pool_alloc(value v_block_wosize, value v_block_count) {
   }
 
   ptrdiff_t pool_ptr = (ptrdiff_t)pool;
-  return Val_long(pool_ptr - 1);
+  return pool_ptr + 1;
 }
 
 CAMLprim value ooh_pool_free(value v_pool_ptr) {
-  ptrdiff_t pool_ptr = Long_val(v_pool_ptr);
-  void* pool = (void*)(pool_ptr+1);
+  ptrdiff_t pool_ptr = (ptrdiff_t)v_pool_ptr - 1;
+  void* pool = (void*)(pool_ptr);
   free(pool);
   return Val_unit;
 }

@@ -1,0 +1,6 @@
+(library
+  (name ooh_test)
+  (libraries ooh)
+  (preprocess (pps ppx_jane))
+  (inline_tests)
+  )

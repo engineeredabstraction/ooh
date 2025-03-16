@@ -126,7 +126,11 @@ module type S = sig
 
     type 'container t = ('container, Raw.t) Container.t
 
-    type 'ret create := element_wosize:int -> ?initial_size:int -> unit -> 'ret
+    type 'ret create 
+    := element_size:[`Words of int | `Typerep of Typerep_lib.Std.Typerep.packed]
+      -> ?initial_size:int
+      -> unit
+      -> 'ret
 
     val create : Raw.t Container.Packed.t create
     val create_permanent : unit t create
