@@ -59,6 +59,9 @@ module Option0 = struct
         match Raw.kind t with
         | V00 -> true
         | V01 -> false
+
+      let unsafe_value (type value) (T t : value t) : value =
+        Raw.get ((Obj.magic t) : (< v00 : value; .. >, value) Raw.t)
     end
   end
 end
