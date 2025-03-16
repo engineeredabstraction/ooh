@@ -50,3 +50,18 @@ let create
   =
   T (Raw.create encoded witness)
 
+module Option0 = struct
+  type nonrec 'value t = ('value, unit, Nothing.t, Nothing.t) t
+
+  module Optional_syntax = struct
+    module Optional_syntax = struct
+      let is_none (type value) (T t : value t) : bool =
+        match Raw.kind t, Raw.get t with
+        | V00, _ -> true
+        | V01, _ -> false
+        | V10, _ -> .
+        | V11, _ -> .
+    end
+  end
+
+end
