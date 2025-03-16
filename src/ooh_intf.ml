@@ -51,11 +51,11 @@ module type S = sig
   end
 
   module Witness : sig
-    type ('v00, 'v01, 'v10, 'v11, 'v) t =
-      | V00 : ('v00, _, _, _, 'v00) t
-      | V01 : (_, 'v01, _, _, 'v01) t
-      | V10 : (_, _, 'v10, _, 'v10) t
-      | V11 : (_, _, _, 'v11, 'v11) t
+    type ('vs, 'v) t =
+      | V00 : (< v00 : 'v00; ..>, 'v00) t
+      | V01 : (< v01 : 'v01; ..>, 'v01) t
+      | V10 : (< v10 : 'v10; ..>, 'v10) t
+      | V11 : (< v11 : 'v11; ..>, 'v11) t
   end
 
   module rec Encoded : sig
@@ -88,25 +88,25 @@ module type S = sig
 
   and Multi_valued : sig
     module Raw : sig
-      type ('v00, 'v01, 'v10, 'v11, 'v) t [@@immediate]
+      type ('vs, 'v) t [@@immediate]
 
-      val kind : ('v00, 'v01, 'v10, 'v11, 'v) t -> ('v00, 'v01, 'v10, 'v11, 'v) Witness.t
+      val kind : ('vs, 'v) t -> ('vs, 'v) Witness.t
     end
 
-    type ('v00, 'v01, 'v10, 'v11) t =
+    type 'vs t =
       | T 
-        : ('v00, 'v01, 'v10, 'v11, 'v) Raw.t
-          -> ('v00, 'v01, 'v10, 'v11) t
+        : ('vs, 'v) Raw.t
+          -> 'vs t
     [@@unboxed] [@@immediate]
 
     val create
       :  'v Encoded.t
-      -> ('v00, 'v01, 'v10, 'v11, 'v) Witness.t
-      -> ('v00, 'v01, 'v10, 'v11) t
+      -> ('vs, 'v) Witness.t
+      -> 'vs t
   end
 
   and Option0 : sig
-    type 'value t = ('value, unit, Nothing.t, Nothing.t) Multi_valued.t
+    type 'value t = < v00 : 'value; v01 : unit > Multi_valued.t
 
     module Optional_syntax : sig
       module Optional_syntax : sig

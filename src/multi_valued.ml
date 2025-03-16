@@ -1,67 +1,64 @@
 
 module Raw : sig
-  type ('v00, 'v01, 'v10, 'v11, 'v) t [@@immediate]
+  type ('vs, 'v) t [@@immediate]
 
-  val kind : ('v00, 'v01, 'v10, 'v11, 'v) t -> ('v00, 'v01, 'v10, 'v11, 'v) Witness.t
+  val kind : ('vs, 'v) t -> ('vs, 'v) Witness.t
 
   val create
     :  'v Encoded.t
-    -> ('v00, 'v01, 'v10, 'v11, 'v) Witness.t
-    -> ('v00, 'v01, 'v10, 'v11, 'v) t
+    -> ('vs, 'v) Witness.t
+    -> ('vs, 'v) t
 
-  val get : ('v00, 'v01, 'v10, 'v11, 'v) t -> 'v
+  val get : ('vs, 'v) t -> 'v
 end = struct
-  type ('v00, 'v01, 'v10, 'v11, 'v) t = int
+  type ('vs, 'v) t = int
 
   let kind
-      (type v00 v01 v10 v11 v)
-      (t : (v00, v01, v10, v11, v) t)
-    : (v00, v01, v10, v11, v) Witness.t
+      (type vs v)
+      (t : (vs, v) t)
+    : (vs, v) Witness.t
     =
     Obj.magic (t land 0b11)
 
   let create
-      (type v00 v01 v10 v11 v)
+      (type vs v)
       (encoded : v Encoded.t)
-      (witness : (v00, v01, v10, v11, v) Witness.t)
-    : (v00, v01, v10, v11, v) t
+      (witness : (vs, v) Witness.t)
+    : (vs, v) t
     =
     (Witness.as_int witness) lor (Encoded.Raw.to_int encoded)
 
   let get 
-      (type v00 v01 v10 v11 v)
-      (t : (v00, v01, v10, v11, v) t)
+      (type vs v)
+      (t : (vs, v) t)
     : v
     =
     Obj.magic (t land (lnot 0b11))
 end
 
-type ('v00, 'v01, 'v10, 'v11) t =
+type 'vs t =
   | T 
-    : ('v00, 'v01, 'v10, 'v11, 'v) Raw.t
-      -> ('v00, 'v01, 'v10, 'v11) t
+    : ('vs, 'v) Raw.t
+      -> 'vs t
 [@@unboxed] [@@immediate]
 
 let create
-    (type v00 v01 v10 v11 v)
+    (type vs v)
     (encoded : v Encoded.t)
-    (witness : (v00, v01, v10, v11, v) Witness.t)
-  : (v00, v01, v10, v11) t
+    (witness : (vs, v) Witness.t)
+  : vs t
   =
   T (Raw.create encoded witness)
 
 module Option0 = struct
-  type nonrec 'value t = ('value, unit, Nothing.t, Nothing.t) t
+  type nonrec 'value t = < v00 : 'value; v01 : unit > t
 
   module Optional_syntax = struct
     module Optional_syntax = struct
       let is_none (type value) (T t : value t) : bool =
-        match Raw.kind t, Raw.get t with
-        | V00, _ -> true
-        | V01, _ -> false
-        | V10, _ -> .
-        | V11, _ -> .
+        match Raw.kind t with
+        | V00 -> true
+        | V01 -> false
     end
   end
-
 end
