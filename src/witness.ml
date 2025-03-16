@@ -1,3 +1,6 @@
+(* SPDX-FileCopyrightText: Copyright (C) 2025 Stefan Muenzel
+ * SPDX-License-Identifier: MPL-2.0
+ *)
 
 type ('vs, 'v) t =
   | V00 : (< v00 : 'v00; ..>, 'v00) t
