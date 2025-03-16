@@ -5,7 +5,7 @@
 #include <caml/mlvalues.h>
 #include <caml/memory.h>
 
-CAMLprim value caml_pool_alloc(value v_block_wosize, value v_block_count) {
+CAMLprim value ooh_pool_alloc(value v_block_wosize, value v_block_count) {
   size_t block_wosize = Long_val(v_block_wosize);
   size_t block_count = Long_val(v_block_count);
   size_t block_byte_size = (1+block_wosize)*sizeof(value);
@@ -23,7 +23,7 @@ CAMLprim value caml_pool_alloc(value v_block_wosize, value v_block_count) {
   return Val_long(pool_ptr - 1);
 }
 
-CAMLprim value caml_pool_free(value v_pool_ptr) {
+CAMLprim value ooh_pool_free(value v_pool_ptr) {
   ptrdiff_t pool_ptr = Long_val(v_pool_ptr);
   void* pool = (void*)(pool_ptr+1);
   free(pool);

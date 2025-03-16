@@ -8,6 +8,16 @@ module Encoded_pointer : sig
   val offset_words : t -> int -> t
 
   val deref : t -> Obj.t
+
+  val as_int : t -> int
+
+  val is_null : t -> bool
+
+  val get_int_field : t -> int -> int
+  val set_int_field : t -> int -> int -> unit
+
+  val get_ptr_field : t -> int -> t
+  val set_ptr_field : t -> int -> t -> unit
 end = struct
   type t = int
 
@@ -15,6 +25,21 @@ end = struct
     t + (i * ((Sys.word_size / 8) / 2))
 
   external deref : t -> Obj.t = "%int_as_pointer"
+
+  let as_int t = t
+
+  let is_null t = t = 0
+
+  let get_int_field t i =
+    let ar : int array = Obj.obj (deref t) in
+    Array.unsafe_get ar i
+
+  let set_int_field t i v =
+    let ar : int array = Obj.obj (deref t) in
+    Array.unsafe_set ar i v
+
+  let get_ptr_field = get_int_field
+  let set_ptr_field = set_int_field
 end
 
 module Pool_section : sig
@@ -28,8 +53,8 @@ module Pool_section : sig
   val entry : t -> int -> Encoded_pointer.t
 end = struct
 
-  external pool_alloc : block_wosize:int -> block_count:int -> Encoded_pointer.t = "caml_pool_alloc"
-  external pool_free : Encoded_pointer.t -> unit = "caml_pool_free"
+  external pool_alloc : block_wosize:int -> block_count:int -> Encoded_pointer.t = "ooh_pool_alloc"
+  external pool_free : Encoded_pointer.t -> unit = "ooh_pool_free"
 
   type t =
     { pointer : Encoded_pointer.t
@@ -38,6 +63,7 @@ end = struct
     }
 
   let create ~block_wosize ~block_count =
+    assert (block_wosize >= 1);
     let pointer = pool_alloc ~block_wosize ~block_count in
     let result =  { pointer; block_wosize; block_count } in
     Gc.finalise
@@ -53,3 +79,49 @@ end = struct
   let entry t i = 
     Encoded_pointer.offset_words t.pointer (i * (t.block_wosize + 1) + 1)
 end
+
+type t =
+  { mutable section_list : Pool_section.t list
+  ; mutable free_list : Encoded_pointer.t
+  ; block_wosize : int
+  ; block_count : int
+  }
+
+let init_section section block_count =
+  for i = 1 to block_count - 1 do
+    let entry = Pool_section.entry section i in
+    let prev_entry = Pool_section.entry section (i - 1) in
+    Encoded_pointer.set_int_field prev_entry 0 (Encoded_pointer.as_int entry)
+  done
+
+let create
+    ~element_wosize
+    ?(initial_size = 64)
+    ()
+  =
+  let block_wosize = element_wosize in
+  let block_count = initial_size in
+  let section = Pool_section.create ~block_wosize ~block_count in
+  let section_list = [ section ] in
+  let free_list = Pool_section.entry section 0 in
+  init_section section block_count;
+  { section_list; free_list; block_wosize; block_count }
+
+let alloc t =
+  let entry = t.free_list in
+  let new_free_list = Encoded_pointer.get_ptr_field entry 0 in
+  t.free_list <- new_free_list;
+  if Encoded_pointer.is_null new_free_list
+  then begin
+    let new_section =
+      Pool_section.create ~block_wosize:t.block_wosize ~block_count:t.block_count
+    in
+    init_section new_section t.block_count;
+    t.section_list <- new_section :: t.section_list;
+    t.free_list <- Pool_section.entry new_section 0
+  end;
+  entry
+
+let free t entry =
+  Encoded_pointer.set_ptr_field entry 0 t.free_list;
+  t.free_list <- entry
