@@ -153,7 +153,6 @@ module type S = sig
 
       val alloc_unitialized : ('container, 'value) t -> ('container, 'value) Ext.t
       val alloc : ('container, 'value) t -> ('container, 'value) Ext.t
-      val alloc_with_tag : ('container, 'value) t -> int -> ('container, 'value) Ext.t
     end
 
     val free : 'container t -> ('container, 'value) Ext.t -> unit

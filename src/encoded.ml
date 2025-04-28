@@ -10,7 +10,7 @@ module Int61_high_bits = struct
   let unchecked_encode (x : value) : value t = x
 
   let encode_exn (x : value) : value t =
-    if x land 3 <> 0 then raise (Invalid_argument "x land 3 <> 0") else x
+    if x land 0b11 <> 0 then raise (Invalid_argument "x land 0b11 <> 0") else x
 
   let decode (x : value t) : value = x
 end

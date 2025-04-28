@@ -126,9 +126,19 @@ module Pool = struct
       |> Raw.Encoded_pointer.as_int
       |> Ext.Unsafe.of_int
 
-    let alloc _ = assert false
+    let alloc ({ container; template} as t) =
+      let block_size = Raw.block_wosize (Container.get container) in
+      let v = alloc_unitialized t in
+      let v' = Ext.get container v in
+      for i = 1 to pred block_size do
+        Obj.set_raw_field (Obj.repr v') i (Obj.raw_field (Obj.repr template) i)
+      done;
+      v
 
+    (* CR smuenzel: implement alloc_with_tag *)
+      (*
     let alloc_with_tag _ = assert false
+         *)
   end
 
 end
