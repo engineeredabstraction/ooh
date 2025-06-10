@@ -5,10 +5,10 @@ description: "Out-of-heap data"
 maintainer: ["Stefan Muenzel"]
 authors: ["Stefan Muenzel"]
 license: "MPL-2.0"
-tags: ["topics" "to describe" "your" "project"]
-homepage: "https://github.com/smuenzel/ooh"
+tags: ["topics" "out-of-heap"]
+homepage: "https://github.com/engineeredabstraction/ooh"
 doc: "https://url/to/documentation"
-bug-reports: "https://github.com/smuenzel/ooh/issues"
+bug-reports: "https://github.com/engineeredabstraction/ooh/issues"
 depends: [
   "ocaml"
   "dune" {>= "3.16"}
@@ -34,4 +34,4 @@ build: [
     "@doc" {with-doc}
   ]
 ]
-dev-repo: "git+https://github.com/smuenzel/ooh.git"
+dev-repo: "git+https://github.com/engineeredabstraction/ooh.git"

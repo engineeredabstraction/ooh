@@ -5,7 +5,7 @@
 (generate_opam_files true)
 
 (source
- (github smuenzel/ooh))
+ (github engineeredabstraction/ooh))
 
 (authors "Stefan Muenzel")
 
@@ -28,4 +28,4 @@
    ppx_optional
    ppx_pipebang
    ppx_typerep_conv)
-  (tags (topics "to describe" your project)))
+  (tags (topics out-of-heap)))
