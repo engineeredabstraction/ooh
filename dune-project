@@ -22,9 +22,10 @@
   (depends
    ocaml
    dune
-   ppx_optional
    typerep
    cinaps
+   (ppx_jane :with_test)
+   ppx_optional
    ppx_pipebang
    ppx_typerep_conv)
   (tags (topics "to describe" your project)))

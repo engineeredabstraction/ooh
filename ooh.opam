@@ -12,9 +12,10 @@ bug-reports: "https://github.com/smuenzel/ooh/issues"
 depends: [
   "ocaml"
   "dune" {>= "3.16"}
-  "ppx_optional"
   "typerep"
   "cinaps"
+  "ppx_jane" {with_test}
+  "ppx_optional"
   "ppx_pipebang"
   "ppx_typerep_conv"
   "odoc" {with-doc}
