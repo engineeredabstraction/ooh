@@ -24,7 +24,7 @@
    dune
    typerep
    cinaps
-   (ppx_jane :with_test)
+   (ppx_jane :with-test)
    ppx_optional
    ppx_pipebang
    ppx_typerep_conv)
