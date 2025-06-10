@@ -16,9 +16,15 @@
 (documentation https://url/to/documentation)
 
 (package
- (name ooh)
- (synopsis "OCaml out-of-heap")
- (description "Out-of-heap data")
- (depends ocaml dune ppx_optional typerep cinaps)
- (tags
-  (topics "to describe" your project)))
+  (name        ooh)
+  (synopsis    "OCaml out-of-heap")
+  (description "Out-of-heap data")
+  (depends
+   ocaml
+   dune
+   ppx_optional
+   typerep
+   cinaps
+   ppx_pipebang
+   ppx_typerep_conv)
+  (tags (topics "to describe" your project)))
