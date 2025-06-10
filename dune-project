@@ -19,6 +19,6 @@
  (name ooh)
  (synopsis "OCaml out-of-heap")
  (description "Out-of-heap data")
- (depends ocaml dune)
+ (depends ocaml dune ppx_optional typerep cinaps)
  (tags
   (topics "to describe" your project)))
