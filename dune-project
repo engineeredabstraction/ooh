@@ -20,7 +20,7 @@
   (synopsis    "OCaml out-of-heap")
   (description "Out-of-heap data")
   (depends
-   ocaml
+   (ocaml (>= 4.12))
    dune
    typerep
    cinaps
@@ -28,4 +28,4 @@
    ppx_optional
    ppx_pipebang
    ppx_typerep_conv)
-  (tags (topics out-of-heap)))
+  (tags (out-of-heap)))
