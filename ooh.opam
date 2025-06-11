@@ -7,7 +7,6 @@ authors: ["Stefan Muenzel"]
 license: "MPL-2.0"
 tags: ["out-of-heap"]
 homepage: "https://github.com/engineeredabstraction/ooh"
-doc: "https://url/to/documentation"
 bug-reports: "https://github.com/engineeredabstraction/ooh/issues"
 depends: [
   "ocaml" {>= "4.12"}
@@ -35,3 +34,4 @@ build: [
   ]
 ]
 dev-repo: "git+https://github.com/engineeredabstraction/ooh.git"
+available: arch != "arm32" & arch != "x86_32"
