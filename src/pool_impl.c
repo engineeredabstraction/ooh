@@ -21,12 +21,12 @@ CAMLprim value ooh_pool_alloc(value v_block_wosize, value v_block_count) {
     }
   }
 
-  ptrdiff_t pool_ptr = (ptrdiff_t)pool;
+  uintptr_t pool_ptr = (uintptr_t)pool;
   return pool_ptr + 1;
 }
 
 CAMLprim value ooh_pool_free(value v_pool_ptr) {
-  ptrdiff_t pool_ptr = (ptrdiff_t)v_pool_ptr - 1;
+  uintptr_t pool_ptr = (uintptr_t)v_pool_ptr - 1;
   void* pool = (void*)(pool_ptr);
   free(pool);
   return Val_unit;
